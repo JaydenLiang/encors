@@ -76,16 +76,16 @@ There are two ways to pass the requested URI to the Encors servcie you chose:
 
 >   `http://encors.me/http://www.pjliang.com/json/fake-users.json`
 
-> 2. Passing it as an 'encors-src' key-value pair parameter in header, via a **POST** method. For example:
+> 2. Passing it as an 'encors-target' key-value pair parameter in header, via a **POST** method. For example:
 
->  * set a key-value pair with  **encors-src** as key, and  **http://www.pjliang.com/json/fake-users.json** as value.
+>  * set a key-value pair with  **encors-target** as key, and  **http://www.pjliang.com/json/fake-users.json** as value.
 
 
 ## Acceptable Parameter(s)
 
-Here is a set of acceptable header parameters to use. Only the **encors-src** parameter is acceptable through url via **GET** method. Any other must be provided in request header. Detailed examples will be given below.
+Here is a set of acceptable header parameters to use. Only the **encors-target** parameter is acceptable through url via **GET** method. Any other must be provided in request header. Detailed examples will be given below.
 
-### *encors-src*
+### *encors-target*
 
 >The resource to request. Accept values:
 
@@ -97,7 +97,7 @@ Here is a set of acceptable header parameters to use. Only the **encors-src** pa
 
 > `http://encors.me/http://www.pjliang.com/json/fake-users.json`
 
-> `(in request header) encors-src=http://www.pjliang.com/json/fake-users.json`
+> `(in request header) encors-target=http://www.pjliang.com/json/fake-users.json`
 
 ### *encors-jsonp*
 
