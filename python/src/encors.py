@@ -4,67 +4,42 @@ from urllib.parse import urlparse
 import requests
 import markdown
 from encors_allowed_origins import ALLOWED_ORIGINS
-from encors_authorizations import AUTHORIZATIONS
 from encors_conf import *
 # initialize the Flask app using a customized template folder
 app = Flask(__name__, template_folder='templates')
 
-@app.route('/<path:path>')
-def encors_catch_all(path):
-    return 'you route to: %s' % path
+@app.route('/<path:url_src>')
+def encors_catch_all(url_src):
+    return encors_proxy(url_src)
 
 @app.route('/', methods=['GET', 'POST'])
-def encors_proxy():
+def encors_proxy(url_src=''):
     try:
-        if request.method == 'GET':
-            src = request.args.get('src', default = '', type = str)
-            #no src provided, display default page as website
-            if(src == ''):
-                return defaultOutput()
-            fmt = request.args.get('format', default = 'text', type = str)
-            src_url = urlparse(src)
-            origin = urlparse(request.url_root)
-            if len(ALLOWED_ORIGINS) == 0 or origin.hostname in ALLOWED_ORIGINS:
-                res = requests.get(src, stream = True)
-                if res.encoding is None:
-                    res.encoding = 'utf-8'
-                stream_content = res.text
-                if(CHUNK_SIZE_LIMIT_IN_BYTE > 0):
-                    stream_size = 0
-                    for chunk in res.iter_content(CHUNK_SIZE_LIMIT_IN_BYTE):
-                        stream_size += len(chunk)
-                        if(CONTENT_SIZE_LIMIT_IN_BYTE > 0 and (stream_size + CHUNK_SIZE_LIMIT_IN_BYTE > CONTENT_SIZE_LIMIT_IN_BYTE)):
-                            return outputError('Source exceeds size limit: ' + str(CONTENT_SIZE_LIMIT_IN_BYTE) + ' bytes')
-                response = make_response(stream_content)
-                if fmt == 'json':
-                    response.headers['content-type'] = 'application/json; charset=' + res.encoding
-                response.headers['Access-Control-Allow-Origin'] = '*'
-                return response
-            else:
-                pass
-        elif request.method == 'POST':
-            # if authorization enabled, check authorization
-            if len(AUTHORIZATIONS) == 0 or (len(AUTHORIZATIONS) > 0 and request.headers.get('Authorization') in AUTHORIZATIONS):
-                src = request.headers.get('src', default = '', type = str)
-                #no src provided, display default page as website
-                if(src == ''):
-                    return defaultOutput()
-                fmt = request.headers.get('format', default = 'text', type = str)
-                src_url = urlparse(src)
-                res = requests.get(src)
-                if fmt == 'text':
-                    response = make_response(str(res.text))
-                elif fmt == 'json':
-                    response = make_response(json.dumps(res.json()))
-                else:
-                    response = make_response(str(res.text))
-                response.headers['Access-Control-Allow-Origin'] = '*'
-                return response
-            else:
-                pass
-        else:
-            pass
-        return defaultOutput()
+        encors_target = request.headers.get('encors-target', default = url_src, type = str)
+        if(encors_target == ''):
+            return defaultOutput()
+        # filter by ALLOWED_ORIGINS
+        origin = urlparse(request.url_root)
+        if len(ALLOWED_ORIGINS) > 0 and origin.hostname not in ALLOWED_ORIGINS:
+            return outputUnauthorizedAccess()
+        src_url = urlparse(encors_target)
+        res = requests.get(encors_target, stream = True)
+        if res.encoding is None:
+            res.encoding = 'utf-8'
+        stream_content = res.text # will it read the whole data here already?
+        if(CHUNK_SIZE_LIMIT_IN_BYTE > 0):
+            stream_size = 0
+            for chunk in res.iter_content(CHUNK_SIZE_LIMIT_IN_BYTE):
+                stream_size += len(chunk)
+                if(CONTENT_SIZE_LIMIT_IN_BYTE > 0 and (stream_size + CHUNK_SIZE_LIMIT_IN_BYTE > CONTENT_SIZE_LIMIT_IN_BYTE)):
+                    return outputError('Source exceeds size limit: ' + str(CONTENT_SIZE_LIMIT_IN_BYTE) + ' bytes')
+        response = make_response(stream_content)
+        # forward its original headers
+        for key in res.headers.keys():
+            response.headers[key] = res.headers[key]
+        # add the CORS control header
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
     except Exception as e:
         #show error traceback information only when Flask debug mode is on
         if(app.debug):
@@ -86,3 +61,6 @@ def defaultOutput():
 # output unified error json object
 def outputError(e):
     return jsonify({'error': True, 'message': str(e)})
+
+def outputUnauthorizedAccess():
+    return make_response('Unauthorized access.', 401, {'WWW-Authenticate':'Basic realm="Encors access control"'})
