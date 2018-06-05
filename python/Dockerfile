@@ -2,7 +2,9 @@ FROM python:3.6-slim
 
 RUN mkdir /root/encors-py
 
-COPY ./ /root/encors-py
+COPY ./requirements.txt /root/encors-py/requirements.txt
+
+COPY ./src /root/encors-py/src
 
 RUN pip install -r /root/encors-py/requirements.txt
 

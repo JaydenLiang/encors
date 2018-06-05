@@ -50,7 +50,7 @@ This section of installation requires a [Docker](https://www.docker.com/) enviro
 
 > 2. Run it as a daemon container binding local port 8000 to port 8000 of the container:
 
->  `docker run -d -p 8000:8000 encors-py`
+>  `docker run -d -p 8000:8000 encors/encors-py`
 
 >  Then Encors is ready on: **http://localhost:8000/**
 
