@@ -58,67 +58,78 @@ This section of installation requires a [Docker](https://www.docker.com/) enviro
 
 # Usage
 
+## Use the Encors service
+You can either install and run the Encors service locally or in your organization network.
+
+In addition, you can use the free Encors service from http://encors.me/.
+
 ## Request a resource
-You can either install and run it locally, in your organization network, or you can use the free Encors service from http://encors.me/. To load a resource from: https://jsonplaceholder.typicode.com/users, you can do it:
+There are two ways to pass the requested URI to the Encors servcie you chose:
 
-> 1. using your own Encors service:
+> * Passing it as the parameter to the end of the service url, via a **GET** method. For examples:
 
->   `http://localhost:8000/?src=https://jsonplaceholder.typicode.com/users`
+>   1. using your own Encors service:
 
-> 2. using the free Encors service from http://encors.me/:
+>   `http://localhost:8000/http://www.pjliang.com/json/fake-users.json`
 
->   `http://encors.me/?src=https://jsonplaceholder.typicode.com/users`
+>   2. using the free Encors service from http://encors.me/:
 
-## Parameters
+>   `http://encors.me/http://www.pjliang.com/json/fake-users.json`
 
-All parameters available in GET method must be sent via url query in GET method; those in POST method must be sent via request header in POST method.
+> 2. Passing it as an 'encors-target' key-value pair parameter in header, via a **POST** method. For example:
 
-### *src*
+>  * set a key-value pair with  **encors-target** as key, and  **http://www.pjliang.com/json/fake-users.json** as value.
 
->The URI of resource to request. Available in GET, POST methods.
 
-> Accepted values: any valid URI.
+## Acceptable Parameter(s)
 
-### *format*
+Here is a set of acceptable header parameters to use. Only the **encors-target** parameter is acceptable through url via **GET** method. Any other must be provided in request header. Detailed examples will be given below.
 
->To specify the content type of response. Available in GET, POST methods.
+### *encors-target*
+
+>The resource to request. Accept values:
+
+> * a valid URI
+
+> Note: If provided through the request url via **GET** method, the key is omitted. If provided in both url and header, value in header will be accepted.
+
+> Examples:
+
+> `http://encors.me/http://www.pjliang.com/json/fake-users.json`
+
+> `(in request header) encors-target=http://www.pjliang.com/json/fake-users.json`
+
+### *encors-jsonp*
+
+> If you intend to get a response with the JSONP method support. It will try to return the resource in a JSONP way. See [JSONP in W3School](https://www.w3schools.com/js/js_json_jsonp.asp).
 
 > Accepted values:
 
-> 1. text
-> 2. json
+> * **jsonp** ( yes. use the string literal 'jsonp' as a value)
 
-### *authentication*
+> Note: Only a resource with a content-type: **application/json** will be passed with JSON Paddings. Other resource types will skip this and return in its original content-type.
 
-> To use one or any authentication token to allow for a limit number of users to request from your service. Available in POST method.
+> Example:
 
-> Note: authentication tokens can be defined in cors_authentications.py
+> `(in request header) encors-jsonp=jsonp`
 
 ## Service configuration
 
 You can configure your Encors service to meet your own needs:
 
-> 1. To limit the size of resource been requested able to get through your Encors service:
+> 1. To limit the size of resource been passed through your Encors service:
 
 >  Modify the value of *CONTENT\_SIZE\_LIMIT\_IN\_BYTE* variable in encors\_conf.py
 
 >    `CONTENT_SIZE_LIMIT_IN_BYTE = 2048000`
 
->  Value is count in byte.
+>   Content size is measured in byte.
 
-> 2. To limit your service to accept requests (via GET method) from a list of pre-defined origins (aka: domain names) only:
+> 2. To control to your service to only accept requests (via GET or POST method) from a list of recognized origins (aka: domain names):
 
 >   Add an origin to encors\_allowed\_origins.py
 
 >  `ALLOWED_ORIGINS = ['pjliang.com', 'github.com']`
-
-> 3. To limit your service to accept requests (via POST method) from those who know an authentication token only:
-
->  Add a token to encors\_authentications.py, for example:
-
->  `AUTHENTICATIONS = ['UnGZw9rFOVPqkVTimaAQE8T7WE3aJBdt', '4QZGYBZASwoey29uh5bffO8PsjxP5QYC']`
-
->  Then, let them know a token, and voilà! They can now use a token to send a request from your Encors service via POST method.
 
 ## Limitations in Encors (current version)
 
@@ -126,14 +137,14 @@ You can configure your Encors service to meet your own needs:
 
 2. content size limit will be applied globally across the entire service regardless allowed\_origins or authentication tokens, GET or POST method.
 
-3. Service in https is not tested. Don't expect it to work in https, please.
+3. Service in https is not tested yet.
 
 4. It only works for resources which don't originally have an 'Access-Control-Allow-Origin' header. For those already have such access control, Encors can't help.
 
 ## License, Terms & Conditions
 Please refer to the LICENSE file in this project.
 
-##Third-Party Library Disclosures 
+##Third-Party Library Disclosures Notice 
 Please refer to the NOTICE file in this project.
 
 ## Resources
@@ -142,3 +153,4 @@ For more information about CORS, please refer to:
 * https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 * https://en.wikipedia.org/wiki/Cross-origin_resource_sharing
 * https://enable-cors.org/
+* https://www.w3schools.com/js/js_json_jsonp.asp
