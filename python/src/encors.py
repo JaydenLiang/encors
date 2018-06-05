@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
+import os
 from flask import Flask, request, make_response, redirect, jsonify, render_template
 from urllib.parse import urlparse
 import requests
 import markdown
-from encors_allowed_origins import ALLOWED_ORIGINS
-from encors_conf import *
+if(__name__) == 'encors':
+    from encors_allowed_origins import ALLOWED_ORIGINS
+    from encors_conf import *
+else:
+    from src.encors_allowed_origins import ALLOWED_ORIGINS
+    from src.encors_conf import *
+
 # initialize the Flask app using a customized template folder
 app = Flask(__name__, template_folder='templates')
 
