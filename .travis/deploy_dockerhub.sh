@@ -1,6 +1,8 @@
 #!/bin/bash
 docker login -u $DOCKER_USER --password $DOCKER_PASS
-if [ "$1" = "staging" ]; then
+if [ "$1" = "develop" ]; then
+    TAG="develop"
+elif [ "$1" = "staging" ]; then
     TAG="staging"
 elif [ "$1" = "production" ]; then
     TAG="latest"
