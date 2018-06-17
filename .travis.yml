@@ -11,5 +11,10 @@ matrix:
         - cd python
       script:
         - python -m pytest -s tests/
+      services:
+        - docker
+      after_success:
+        - cd ..
+        - sh .travis/deploy_dockerhub.sh
 notifications:
     email: false
