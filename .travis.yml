@@ -11,11 +11,10 @@ matrix:
         - cd python
       script:
         - python -m pytest -s tests/
-      services:
-        - docker
-      after_success:
         - cd ..
         - bash .travis/deploy_dockerhub.sh test
+      services:
+        - docker
       deploy:
         # deploy to the develop environment
         - provider: script
