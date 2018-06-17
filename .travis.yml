@@ -2,6 +2,8 @@ dist: trusty
 matrix:
   include:
     - language: python
+      services:
+        - docker
       python:
         - 3.6
       cache: pip
@@ -11,5 +13,27 @@ matrix:
         - cd python
       script:
         - python -m pytest -s tests/
+      after_success:
+        - cd ..
+        - bash .travis/deploy_dockerhub.sh test
+      deploy:
+        # deploy to the develop environment
+        - provider: script
+          script:
+            - bash .travis/deploy_dockerhub.sh develop push
+          on:
+            branch: develop
+        # deploy to the staging environment
+        - provider: script
+          script: 
+            - bash .travis/deploy_dockerhub.sh staging push
+          on:
+            branch: staging
+        # deploy master to production
+        - provider: script
+          script: 
+            - bash .travis/deploy_dockerhub.sh production push
+          on:
+            branch: master
 notifications:
     email: false
