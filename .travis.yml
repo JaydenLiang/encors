@@ -12,6 +12,7 @@ matrix:
       script:
         - python -m pytest -s tests/
       after_success:
+        - cd ..
         - bash .travis/deploy_dockerhub.sh staging
       deploy:
         # deploy develop to the staging environment
