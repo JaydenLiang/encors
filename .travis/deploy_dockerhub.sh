@@ -16,4 +16,6 @@ docker build -f python/Dockerfile -t $DOCKER_REPO:$TAG python/
 #push to docker hub
 if [ "$2" = "push" ]; then
     docker push $DOCKER_REPO
+else
+    docker rmi $DOCKER_REPO
 fi
