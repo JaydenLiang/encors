@@ -2,6 +2,8 @@ dist: trusty
 matrix:
   include:
     - language: python
+      services:
+        -docker
       python:
         - 3.6
       cache: pip
