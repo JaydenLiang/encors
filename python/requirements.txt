@@ -5,9 +5,9 @@ Flask==1.0.2
 gunicorn==19.8.1
 idna==2.6
 itsdangerous==0.24
-Jinja2==2.10
+Jinja2==2.10.1
 Markdown==2.6.11
 MarkupSafe==1.0
-requests==2.18.4
-urllib3==1.22
+requests==2.21
+urllib3==1.24.2
 Werkzeug==0.14.1
